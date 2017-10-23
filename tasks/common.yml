@@ -1,7 +1,7 @@
 ---
 
 - name: common | Create the directories for site specific configurations
-  file: 
+  file:
       path="{{ nginx_etc }}/{{ item }}"
       state=directory
       owner=root
@@ -10,19 +10,20 @@
   with_items:
     - "sites-available"
     - "sites-enabled"
+    - "fragments"
 
-- name: common | Copy the nginx default configuration file 
-  template: 
+- name: common | Copy the nginx default configuration file
+  template:
     src=default.j2
     dest="{{ nginx_etc }}/sites-available/default.conf"
 
-- name: common |Copy the nginx default site configuration file 
-  template: 
+- name: common |Copy the nginx default site configuration file
+  template:
     src=default.j2
     dest="{{ nginx_etc }}/sites-available/default"
 
 - name: common | Create the link for site enabled specific configurations
-  file: 
+  file:
     path="{{ nginx_etc }}/sites-enabled/default"
     state=link
     src="{{ nginx_etc }}/sites-available/default"
@@ -33,33 +34,49 @@
     dest="{{ nginx_etc }}/sites-available/{{ item.file_name }}.conf"
   with_items: "{{ nginx_site }}"
   when: nginx_site | lower != 'none'
-  notify: 
+  notify:
    - check reload nginx
 
 ## TODO: Add condition to disable/enable sites
 - name: Create the link for site enabled specific configurations
-  file: 
+  file:
      path="{{ nginx_etc }}/sites-enabled/{{ item.file_name }}.conf"
      state=link
      src="{{ nginx_etc }}/sites-available/{{ item.file_name }}.conf"
   with_items: "{{ nginx_site }}"
   when: nginx_site | lower != 'none'
-  notify: 
+  notify:
    - check reload nginx
 
-- name: common | Copy the nginx main configuration file 
-  template: 
+- name: common | Create the  configuration files for fragments
+  template:
+    src=fragments.j2
+    dest="{{ nginx_etc }}/fragments/fragments.conf"
+  when: fragments is defined and fragments['list'] is defined
+  notify:
+   - check reload nginx
+
+- name: common | Create the  configuration files for fragment-upstreams
+  template:
+    src=fragment_upstreams.j2
+    dest="{{ nginx_etc }}/fragments/fragment.upstreams.conf"
+  when: fragments is defined and fragments['list'] is defined
+  notify:
+   - check reload nginx
+
+- name: common | Copy the nginx main configuration file
+  template:
     src=nginx.conf.j2
     dest="{{ nginx_etc }}/nginx.conf"
     validate='nginx -t -c %s'
-  notify: 
-   - check restart nginx   
+  notify:
+   - check restart nginx
 
 - include: "manage_sites.yml"
   when: nginx_manage_sites
 
 - name: common | start the nginx service
-  service: 
+  service:
     name=nginx
     state=started
     enabled=yes

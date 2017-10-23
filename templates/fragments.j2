@@ -1,0 +1,24 @@
+##{{ ansible_managed }}
+{% for fragment in fragments['list'] %}
+  location {{ fragment.path }} {
+    proxy_pass http://{{fragment.proxy_pass}};
+{% if 'proxy_intercept_errors' in fragment %}
+    proxy_intercept_errors {{ fragment['proxy_intercept_errors'] }};
+{% endif %}
+{% set combined_config = fragments['common_config'] %}
+{% set _ = combined_config.update(fragment) %}
+{% for key, value in combined_config.iteritems() %}
+{% if key in ['proxy_pass', 'path'] %}
+{% else %}
+{% if value is iterable and value is not string %}
+{% for array_value in value %}
+    {{ key }} {{ array_value }};
+{% endfor %}
+{% else %}
+    {{ key }} {{ value }};
+{% endif %}
+{% endif %}
+{% endfor %}
+  }
+
+{% endfor %}

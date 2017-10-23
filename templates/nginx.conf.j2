@@ -1,9 +1,9 @@
 #{{ ansible_managed }}
-{% if ansible_os_family == 'RedHat' %} 
+{% if ansible_os_family == 'RedHat' %}
 user    nginx;
-{% elif ansible_os_family == 'Debian' %} 
+{% elif ansible_os_family == 'Debian' %}
 user    www-data;
-{% elif ansible_os_family == 'Solaris' %} 
+{% elif ansible_os_family == 'Solaris' %}
 user    www  www;
 {% endif %}
 
@@ -32,5 +32,8 @@ http {
     gzip_disable "msie6";
 
     include {{ nginx_etc }}/conf.d/*.conf;
+{% if fragments is defined and 'list' in fragments %}
+    include {{ nginx_etc }}/fragments/fragment.upstreams.conf;
+{% endif %}
     include {{ nginx_etc }}/sites-enabled/*;
 }

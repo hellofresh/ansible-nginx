@@ -19,6 +19,23 @@
                                              try_files: "$uri $uri/ /index.html",
                                              root: "/nginx/test1/"
                                            }
+        fragments:
+          list:
+            - path: "~* ^/fragment1($|/.*$)"
+              proxy_pass: "some-upstream"
+              server: "localhost"
+
+            - path: "~* ^/fragment2($|/.*$)"
+              proxy_pass: "some-upstream"
+              server: "localhost"
+              proxy_set_header:
+                - "Proxy 'XYZZY'"
+
+          common_config:
+          # list of common nginx config options for all fragments
+              proxy_set_header:
+                - "X-Forwarded-Proto https"
+                - "Proxy ''" #https://httpoxy.org/
   pre_tasks:
             - name: update apt
               apt: update_cache=yes cache_valid_time=3600

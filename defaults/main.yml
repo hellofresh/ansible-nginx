@@ -39,3 +39,19 @@ nginx_site                       :
                      allow       : "127.0.0.1"
                      deny        : "all" 
 
+fragments:
+  list:
+    - path: "~* ^/fragment1($|/.*$)"
+      proxy_pass: "some-upstream"
+      # If upstream not defined uses the target as a service name from consul
+      server: "upstream_address1"
+
+    - path: "~* ^/other_fragment($|/.*$)"
+      proxy_pass: "other-upstream"
+      server: "upstream_address2"
+
+  common_config:
+  # list of common nginx config options for all fragments
+    proxy_set_header:
+        - "X-Forwarded-Proto https"
+        - "Proxy ''" #https://httpoxy.org/

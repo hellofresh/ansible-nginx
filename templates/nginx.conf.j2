@@ -32,5 +32,6 @@ http {
     gzip_disable "msie6";
 
     include {{ nginx_etc }}/conf.d/*.conf;
+    include {{ nginx_etc }}/fragments/fragment.upstreams.conf;
     include {{ nginx_etc }}/sites-enabled/*;
 }

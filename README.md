@@ -50,6 +50,28 @@ them are as follows.
         location1: {name: /, try_files: "$uri $uri/ /index.html"}
         location2: {name: /images/, try_files: "$uri $uri/ /index.html"}
 
+    # A list of fragments to route to with nginx options
+    # Options from common_config are the default, fragment options override them
+    #  for example, fragment2 doesn't have X-Forwarded-Proto set.
+    # If a fragment does not have a "server" attribute, the proxy_pass is used
+    #  as a service name from consul.
+    fragments:
+      list:
+        - path: "~* ^/fragment1($|/.*$)"
+          proxy_pass: "some-upstream"
+          server: "localhost"
+
+        - path: "~* ^/fragment2($|/.*$)"
+          proxy_pass: "other-upstream"
+          proxy_set_header:
+            - "Proxy 'XYZZY'"
+
+      common_config:
+      # list of common nginx config options for all fragments
+          proxy_set_header:
+            - "X-Forwarded-Proto https"
+            - "Proxy ''" #https://httpoxy.org/
+
 Examples
 ========
 

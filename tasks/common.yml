@@ -69,14 +69,14 @@
     src=nginx.conf.j2
     dest="{{ nginx_etc }}/nginx.conf"
     validate='nginx -t -c %s'
-  notify: 
-   - check restart nginx   
+  notify:
+   - check restart nginx
 
 - include: "manage_sites.yml"
   when: nginx_manage_sites
 
 - name: common | start the nginx service
-  service: 
+  service:
     name=nginx
     state=started
     enabled=yes

@@ -8,7 +8,7 @@
 {% set combined_config = fragments['common_config'] %}
 {% set _ = combined_config.update(fragment) %}
 {% for key, value in combined_config.iteritems() %}
-{% if key in ['proxy_pass', 'path'] %}
+{% if key in ['proxy_pass', 'path', 'server'] %}
 {% else %}
 {% if value is iterable and value is not string %}
 {% for array_value in value %}

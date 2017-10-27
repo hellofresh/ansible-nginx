@@ -1,7 +1,11 @@
 ##{{ ansible_managed }}
 {% for fragment in fragments['list'] %}
   location {{ fragment.path }} {
-    proxy_pass http://{{fragment.proxy_pass}};
+{% if( (fragment.server is defined) and (kubenv is defined) ) %}
+    proxy_pass http://{{ fragment.server }};
+{% else %}
+    proxy_pass http://{{ fragment.proxy_pass }};
+{% endif %}
 {% set combined_config = fragments['common_config'] %}
 {% set _ = combined_config.update(fragment) %}
 {% for key, value in combined_config.iteritems() %}

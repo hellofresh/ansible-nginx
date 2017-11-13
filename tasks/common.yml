@@ -42,8 +42,7 @@
   template:
     src=locations.j2
     dest="{{ item.nginx_location_file }}"
-  with_items: "{{ locations_upstreams_conf }}"
-  when: locations_upstreams_conf | lower != 'none'
+  with_items: "{{ locations_upstreams_conf | default([]) }}"
   notify:
    - check reload nginx
 
@@ -51,8 +50,7 @@
   template:
     src=upstreams.j2
     dest="{{ item.nginx_upstream_file }}"
-  with_items: "{{ locations_upstreams_conf }}"
-  when: locations_upstreams_conf | lower != 'none'
+  with_items: "{{ locations_upstreams_conf | default([]) }}"
   notify:
    - check reload nginx
 

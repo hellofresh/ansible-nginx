@@ -1,0 +1,23 @@
+##{{ ansible_managed }}
+{% if 'create_upstreams' in item and item['create_upstreams'] == 'false' %}
+{% else %}
+{% set data = {} %}
+{% for config_block in item['list'] %}
+{% if 'proxy_pass' in config_block and not config_block.proxy_pass in data %}
+{% set _ = data.update({config_block.proxy_pass: "1"}) %}
+  upstream {{ config_block.proxy_pass }} {
+{% if 'proxy_pass' in config_block  %}
+{% if config_block.proxy_pass in consul_services%}
+{% if 'local_port' in consul_services[config_block.proxy_pass] %}
+    server 127.0.0.1:{{ consul_services[config_block.proxy_pass]['local_port'] }};
+{% else %}
+    server 127.0.0.1:{{ consul_services[config_block.proxy_pass]['port'] }};
+{% endif %}
+{% else %}
+    server {{ config_block.proxy_pass }};
+{% endif %}
+{% endif %}
+  }
+{% endif %}
+{% endfor %}
+{% endif %}

@@ -5,6 +5,13 @@
   become       : True
   connection   : "{{ kitchen_connection | default('local') }}"
   vars         :
+        consul_services:
+          some-upstream:
+            port: 1337
+          other-upstream:
+            local_port: 8080
+            port: 1338
+
         nginx_site                       :
            - file_name                   : "test"
              blocks                      :
@@ -19,23 +26,36 @@
                                              try_files: "$uri $uri/ /index.html",
                                              root: "/nginx/test1/"
                                            }
-        fragments:
-          list:
+        locations_upstreams_conf:
+          - list:
             - path: "~* ^/fragment1($|/.*$)"
               proxy_pass: "some-upstream"
               server: "localhost"
 
             - path: "~* ^/fragment2($|/.*$)"
-              proxy_pass: "some-upstream"
-              server: "localhost"
+              proxy_pass: "example.com:8080"
               proxy_set_header:
                 - "Proxy 'XYZZY'"
 
-          common_config:
-          # list of common nginx config options for all fragments
+            - path: "~* ^/fragment3($|/.*$)"
+              proxy_pass: "some-upstream"
+
+            - path: "~* ^/fragment4($|/.*$)"
+              proxy_pass: "other-upstream"
+
+            nginx_location_file: "{{ nginx_etc }}/include.d/fragment_locations.conf"
+            nginx_upstream_file: "{{ nginx_etc }}/upstreams.d/fragments_upstreams.conf"
+            common_config:
+            # list of common nginx config options for all fragments
               proxy_set_header:
-                - "X-Forwarded-Proto https"
-                - "Proxy ''" #https://httpoxy.org/
+               - "X-Forwarded-Proto https"
+               - "Proxy ''" #https://httpoxy.org/
+          - list:
+            - path: "~* ^/external($|/.*$)"
+              proxy_pass: "some-upstream"
+            nginx_location_file: "{{ nginx_etc }}/include.d/other_locations.conf"
+            nginx_upstream_file: "{{ nginx_etc }}/upstreams.d/other_upstreams.conf"
+            create_upstreams: "false"
   pre_tasks:
             - name: update apt
               apt: update_cache=yes cache_valid_time=3600
@@ -45,15 +65,15 @@
                 path="/nginx/{{ item }}"
                 state=directory
                 mode=0755
-              with_items: 
+              with_items:
                 - test1
 
-            - name: Create content for test 
+            - name: Create content for test
               copy:
                 content="Hello {{ item }}"
                 dest="/nginx/{{ item }}/index.html"
                 mode=0644
-              with_items: 
+              with_items:
                 - test1
 
   roles        :

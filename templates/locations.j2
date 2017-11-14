@@ -6,7 +6,7 @@
 {% endif %}
 
 {% if 'common_config' in item %}
-{% set combined_config = item['common_config'] %}
+{% set combined_config = dict(item['common_config']) %}
 {% set _ = combined_config.update(config_block) %}
 {% else %}
 {% set combined_config = config_block %}

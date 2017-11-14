@@ -10,7 +10,8 @@
   with_items:
     - "sites-available"
     - "sites-enabled"
-    - "fragments"
+    - "upstreams.d"
+    - "include.d"
 
 - name: common | Copy the nginx default configuration file
   template:
@@ -37,6 +38,22 @@
   notify:
    - check reload nginx
 
+- name: common | Create the new locations
+  template:
+    src=locations.j2
+    dest="{{ item.nginx_location_file }}"
+  with_items: "{{ locations_upstreams_conf | default([]) }}"
+  notify:
+   - check reload nginx
+
+- name: common | Create the new upstreams
+  template:
+    src=upstreams.j2
+    dest="{{ item.nginx_upstream_file }}"
+  with_items: "{{ locations_upstreams_conf | default([]) }}"
+  notify:
+   - check reload nginx
+
 ## TODO: Add condition to disable/enable sites
 - name: Create the link for site enabled specific configurations
   file:
@@ -45,22 +62,6 @@
      src="{{ nginx_etc }}/sites-available/{{ item.file_name }}.conf"
   with_items: "{{ nginx_site }}"
   when: nginx_site | lower != 'none'
-  notify:
-   - check reload nginx
-
-- name: common | Create the  configuration files for fragments
-  template:
-    src=fragments.j2
-    dest="{{ nginx_etc }}/fragments/fragments.conf"
-  when: fragments is defined and fragments['list'] is defined
-  notify:
-   - check reload nginx
-
-- name: common | Create the  configuration files for fragment-upstreams
-  template:
-    src=fragment_upstreams.j2
-    dest="{{ nginx_etc }}/fragments/fragment.upstreams.conf"
-  when: fragments is defined and fragments['list'] is defined
   notify:
    - check reload nginx
 

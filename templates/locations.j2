@@ -1,0 +1,27 @@
+##{{ ansible_managed }}
+{% for config_block in item['list'] %}
+  location {{ config_block.path }} {
+{% if 'proxy_pass' in config_block %}
+    proxy_pass http://{{ config_block.proxy_pass }};
+{% endif %}
+
+{% if 'common_config' in item %}
+{% set combined_config = dict(item['common_config']) %}
+{% set _ = combined_config.update(config_block) %}
+{% else %}
+{% set combined_config = config_block %}
+{% endif %}
+{% for key, value in combined_config.iteritems() %}
+{% if key not in ['proxy_pass', 'path', 'server'] %}
+{% if value is iterable and value is not string %}
+{% for array_value in value %}
+    {{ key }} {{ array_value }};
+{% endfor %}
+{% else %}
+    {{ key }} {{ value }};
+{% endif %}
+{% endif %}
+{% endfor %}
+  }
+
+{% endfor %}

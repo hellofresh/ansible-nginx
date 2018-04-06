@@ -12,7 +12,7 @@
 {% set combined_config = config_block %}
 {% endif %}
 {% for key, value in combined_config.iteritems() %}
-{% if key not in ['proxy_pass', 'path', 'server'] %}
+{% if key not in ['proxy_pass', 'path', 'server', 'no_upstream'] %}
 {% if value is iterable and value is not string %}
 {% for array_value in value %}
     {{ key }} {{ array_value }};

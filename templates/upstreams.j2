@@ -4,11 +4,11 @@
 {% set data = {} %}
 {% for config_block in item['list'] %}
 {% if 'proxy_pass' in config_block and not config_block.proxy_pass in data %}
+{% if 'no_upstream' in config_block and config_block.no_upstream == 'true' %}
+{% else %}
 {% set _ = data.update({config_block.proxy_pass: "1"}) %}
   upstream {{ config_block.proxy_pass }} {
 {% if 'proxy_pass' in config_block  %}
-{% if 'no_upstream' in config_block and config_block.no_upstream == 'true' %}
-{% else %}
 {% if config_block.proxy_pass in consul_services%}
 {% if 'local_port' in consul_services[config_block.proxy_pass] %}
     server 127.0.0.1:{{ consul_services[config_block.proxy_pass]['local_port'] }};

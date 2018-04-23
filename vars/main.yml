@@ -1,7 +1,7 @@
 ---
 
 env:
- RUNLEVEL: 1
+  RUNLEVEL: 1
 
 redhat_pkg:
   - python-selinux
@@ -11,4 +11,4 @@ ubuntu_pkg:
   - nginx
 
 solaris_pkg:
-   - nginx
+  - nginx

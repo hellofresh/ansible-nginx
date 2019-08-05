@@ -2,7 +2,7 @@
 {% for block in item.blocks %}
 {# First level block #}
 {{block.type}} {{ block.name if block.name is defined else "" }} {
-{% for block_key,block_value in block.iteritems() %}
+{% for block_key,block_value in block.items() %}
 {# First level Option1: key = value item #}
 {% if not block_value is mapping and block_key != 'type' and block_key != 'name' and block_value is string %}
   {{ block_key }} {{ block_value }};
@@ -10,7 +10,7 @@
 {% elif block_value is mapping and block_value.type is defined  %}
   {{ block_value.type }} {{ block_value.name if block_value.name is defined else "" }} {
 {# Second level key = value item #}
-{% for block_key_2,block_value_2 in block_value.iteritems() if block_key_2 != 'name' and block_key_2 != 'type' %}
+{% for block_key_2,block_value_2 in block_value.items() if block_key_2 != 'name' and block_key_2 != 'type' %}
 {# option 1 #}
 {% if block_value_2 is iterable and block_value_2 is not string %}
 {% for array_value in block_value_2 %}

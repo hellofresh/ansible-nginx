@@ -17,12 +17,12 @@
 
 - name: manage sites | List of files need to removed
   debug: 
-    var=old_files
+    var: old_files
 
 - name: manage sites | Ensure old services are removed
   file:
-    path="{{ nginx_etc }}/sites-enabled/{{ item.0 }}{{ item.1 }}"
-    state="absent"
+    path: "{{ nginx_etc }}/sites-enabled/{{ item.0 }}{{ item.1 }}"
+    state: "absent"
   with_nested: 
     - "{{ old_files }}"
     - [ "", ".conf"]

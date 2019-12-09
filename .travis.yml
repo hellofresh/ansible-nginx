@@ -3,9 +3,7 @@ language: python
 python: "2.7"
 
 env:
-  - KITCHEN_TEST="simple-v1"
   - KITCHEN_TEST="simple-v2"
-  - KITCHEN_TEST="manage-v1"
   - KITCHEN_TEST="manage-v2"
 
 before_install:
@@ -13,12 +11,10 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq python-apt python-pycurl git python-pip ruby ruby-dev build-essential autoconf
   - gem install bundler
-  # Get ansible install
-  - curl -s https://raw.githubusercontent.com/AutomationWithAnsible/ansible-setup/master/example/travis-install -o /tmp/travis-ansible-setup.sh
 
 install:
-  - bash /tmp/travis-ansible-setup.sh
   - bundle install
+  - pip install ansible==2.9
 
 script:
     - ansible --version

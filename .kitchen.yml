@@ -4,11 +4,10 @@ driver                    :
     box                   : "ubuntu/trusty64"
     customize             :
          cpus             : 2
-         memory           : 2048 
+         memory           : 2048
 
 provisioner:
     name                  : ansible_push
-    verbose               : "vvvv"
     ansible_config        : "test/ansible.cfg"
     idempotency_test      : True
     diff                  : True
@@ -17,13 +16,9 @@ provisioner:
     extra_vars            : { 'kitchen_connection': '<%= if ENV["TRAVIS"] then "local" else "smart" end %>', 'kitchen_hosts': '<%= if ENV["TRAVIS"] then "localhost" else "all" end %>' }
 
 platforms:
- - name                   : "v1"
-   provisioner            :
-     ansible_playbook_bin : "$(ansible-version path v1)ansible-playbook"
-
  - name                   : "v2"
    provisioner            :
-     ansible_playbook_bin : "$(ansible-version path v2)ansible-playbook"
+     ansible_playbook_bin : "ansible-playbook"
 
 suites:
   - name                  : simple

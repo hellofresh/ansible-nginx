@@ -9,7 +9,7 @@
 - name: nginx_debian | apt-update nginx
   apt:
     update_cache=yes
-  when: nginx_apt_repo | changed
+  when: nginx_apt_repo is changed
 
 - name: nginx_debian | Install the nginx packages 
   apt: 
